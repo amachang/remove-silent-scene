@@ -10,6 +10,7 @@ const path = require('path');
 const minimumNotSilentDuration = 1;
 const remainingSilentDuration = 0.4;
 const minimumSilentDuration = 0.2;
+const threasholdVolumeAdjuster = 0;
 
 async function main(mode, ...args) {
     if (mode === 'file') {
@@ -72,7 +73,7 @@ async function removeSilentFromVideoFile(videoPath, outputVideoPath) {
     const volumeDetectOutput = await execFfmpeg('-i', videoPath, '-af', 'volumedetect', '-f', 'null', '-');
     const meanVolume = getMinValumeFromVolumeDetectOutput(volumeDetectOutput);
 
-    const thresholdVolume = meanVolume - 0;
+    const thresholdVolume = meanVolume + threasholdVolumeAdjuster;
     const thresholdDuration = minimumSilentDuration + remainingSilentDuration;
 
     const silenceDetectOutput = await execFfmpeg('-i', videoPath, '-af', `silencedetect=n=${thresholdVolume}dB:d=${thresholdDuration}`, '-f', 'null', '-');
